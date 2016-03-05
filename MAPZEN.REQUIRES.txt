@@ -1,0 +1,2 @@
+# py-mapzen specific dependencies - see scripts/build-mapzen-requires.py for details
+mapzen.whosonfirst.brands.utils
