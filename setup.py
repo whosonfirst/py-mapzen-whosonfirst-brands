@@ -21,45 +21,6 @@ if pkg.startswith("py-mapzen"):
     if os.path.exists(egg_info):
         shutil.rmtree(egg_info)
 
-# Okay carry on as usual... well, except for all the requires stuff
-# below (20160128/thisisaaronland)
-
-# See also: scripts/build-mapzen-requires.py
-
-import json
-
-# please to list your not-MAPZEN.REQUIRES.txt dependencies here - the format is
-# "<PACKAGE> and optional versioning" + ":" + "optional dependency/install link"
-# py-mapzen specific stuff is handled separately afterwards by reading the
-# MAPZEN.REQUIRES.json file (20160128/thisisaaronland)
-
-deps = {
-    'slack.api>=0.04':'https://github.com/whosonfirst/py-slack-api/tarball/master#egg=slack.api-0.04'
-}
-
-requires=[]
-links=[]
-
-mz_deps = os.path.join(parent, "MAPZEN.REQUIRES.json")
-
-if not os.path.exists(mz_deps):
-    raise Exception, "%s does not exist - please run scripts/build-mapzen-requires.py" % mz_deps
-
-mz_fh = open(mz_deps, "r")
-mz_data = json.load(mz_fh)
-
-for pkg, url in mz_data.items():
-    deps[pkg] = url
-
-for pkg, url in deps.items():
-
-    requires.append(pkg)
-
-    if url != '':
-        links.append(url)
-
-# Okay... now we carry on as is...
-
 from setuptools import setup, find_packages
 
 packages = find_packages()
@@ -70,13 +31,12 @@ setup(
     name='mapzen.whosonfirst',
     namespace_packages=[],
     version=version,
-    description='A package to install all the other Who\'s On First Python packages',
+    description='A package for working with Who\'s On First Python brands',
     author='Mapzen',
     url='https://github.com/whosonfirst/py-mapzen-whosonfirst',
-    install_requires=requires,	# see above
-    dependency_links=links,	# no really, see above
     packages=packages,
     scripts=[
+        'scripts/wof-brands-update-venues'
         ],
-    download_url='https://github.com/whosonfirst/py-mapzen-whosonfirst/releases/tag/' + version,
+    download_url='https://github.com/whosonfirst/py-mapzen-whosonfirst-brands/releases/tag/' + version,
     license='BSD')

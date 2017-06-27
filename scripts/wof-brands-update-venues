@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+# -*-python-*-
+
+import os
+import sys
+import logging
+
+import mapzen.whosonfirst.utils
+import mapzen.whosonfirst.export
+
+if __name__ == "__main__":
+
+    import optparse
+    opt_parser = optparse.OptionParser()
+
+    opt_parser.add_option('-B', '--brand_id', dest='brand_id', action='store', default=None, help='A valid Who\'s On First brand ID')
+
+    opt_parser.add_option('-D', '--data-root', dest='data_root', action='store', default='/usr/local/data', help='... (Default is /usr/local/data)')
+    opt_parser.add_option('-R', '--repo', dest='repo', action='store', default=None, help='... ')
+    
+    opt_parser.add_option('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Be chatty (default is false)')
+
+    options, args = opt_parser.parse_args()
+
+    if options.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    if not options.brand_id:
+        logging.error("Missing brand ID")
+        sys.exit(1)
+
+    if not options.repo:
+        logging.error("Missing Who's On First repo")
+        sys.exit(1)
+
+    root = os.path.join(options.data_root, options.repo)
+    data = os.path.join(root, "data")
+
+    if not os.path.exists(data):
+        logging.error("Invalid REPO/data directory %s" % data)
+        sys.exit(1)
+
+    exporter = mapzen.whosonfirst.export.flatfile(data)
+        
+    logging.warning("Be aware we are still not validating brand IDs so please be careful...")
+    
+    brand_id = options.brand_id
+    
+    for wof_id in args:
+
+        feature = mapzen.whosonfirst.utils.load(data, wof_id)
+        props = feature["properties"];
+
+        props["wof:brand_id"] = brand_id
+        feature["properies"] = props
+
+        logging.info(exporter.export_feature(feature))
+
+    sys.exit(0)

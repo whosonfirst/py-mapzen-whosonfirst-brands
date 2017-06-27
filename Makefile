@@ -1,7 +1,5 @@
-build: deps bump
+install:
+	sudo pip install -r requirements.txt .
 
-bump:
-	scripts/bump-version.py
-
-deps:
-	scripts/build-mapzen-requires.py --strict --out MAPZEN.REQUIRES.json
+upgrade:
+	sudo pip install --upgrade -r requirements.txt .
