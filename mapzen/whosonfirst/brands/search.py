@@ -25,13 +25,12 @@ class index(mapzen.whosonfirst.elasticsearch.index):
 
         id = brand['wof:brand_id']
 
-        doctype = 'brand'
-        body = self.prepare_geojson(feature)
+        body = self.prepare_json(brand)
 
         return {
             'id': id,
             'index': self.index,
-            'doc_type': doctype,
+            'doc_type': self.doctype,
             'body': body
         }
 
@@ -41,14 +40,12 @@ class index(mapzen.whosonfirst.elasticsearch.index):
        
         id = brand['wof:brand_id']
 
-        doctype = 'brand'
-
         body = self.prepare_json(brand)
 
         return {
             '_id': id,
             '_index': self.index,
-            '_type': doctype,
+            '_type': self.doctype,
             '_source': body
         }
 

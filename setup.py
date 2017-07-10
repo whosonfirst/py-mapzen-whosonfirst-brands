@@ -36,7 +36,8 @@ setup(
     url='https://github.com/whosonfirst/py-mapzen-whosonfirst',
     packages=packages,
     scripts=[
-        'scripts/wof-brands-update-venues'
+        'scripts/brands-es-index',
+        'scripts/brands-update-venues'
         ],
     download_url='https://github.com/whosonfirst/py-mapzen-whosonfirst-brands/releases/tag/' + version,
     license='BSD')

@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+
+import sys
+import os.path
+import logging
+
+import mapzen.whosonfirst.brands.search
+import mapzen.whosonfirst.brands.utils
+
+if __name__ == '__main__':
+
+    import optparse
+    opt_parser = optparse.OptionParser()
+
+    opt_parser.add_option('-s', '--source', dest='source', action='store', default=None, help='Where to read files from')
+    opt_parser.add_option('-b', '--bulk', dest='bulk', action='store_true', default=False, help='Index files in bulk mode (default is False)')
+
+    opt_parser.add_option('--index', dest='index', action='store', default='brands', help='Where to write the records to (default is whosonfirst)')
+    opt_parser.add_option('--host', dest='host', action='store', default='localhost', help='What host your search index lives (default is localhost)')
+    opt_parser.add_option('--port', dest='port', action='store', default=9200, help='What port your search index lives on (default is 9200)')
+    opt_parser.add_option('--timeout', dest='timeout', action='store', default=600, help='Timeout in seconds for talking to you search index lives on (default is 600)')
+
+    opt_parser.add_option('-v', '--verbose', dest='verbose', action='store_true', default=False, help='Be chatty (default is false)')
+
+    options, args = opt_parser.parse_args()
+
+    if options.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.WARNING)
+
+    idx = mapzen.whosonfirst.brands.search.index(host=options.host, port=options.port, timeout=options.timeout, index=options.index)
+
+    logging.info("indexing from %s to %s" % (options.source, options.index))
+    source = os.path.abspath(options.source)
+    crawl = mapzen.whosonfirst.brands.utils.crawl(source)
+
+    if options.bulk:
+        idx.index_files(crawl)
+
+    else:
+
+        for path in crawl:
+
+            try:
+                logging.debug("index %s" % path)
+                idx.index_file(path)
+            except Exception, e:
+                logging.error("failed to index %s, because %s" % (path, e))
+
+    sys.exit()
