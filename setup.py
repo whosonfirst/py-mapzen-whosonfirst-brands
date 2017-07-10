@@ -28,8 +28,8 @@ desc = open("README.md").read()
 version = open("VERSION").read()
 
 setup(
-    name='mapzen.whosonfirst',
-    namespace_packages=[],
+    name='mapzen.whosonfirst.brands',
+    namespace_packages=[ 'mapzen', 'mapzen.whosonfirst' ],
     version=version,
     description='A package for working with Who\'s On First Python brands',
     author='Mapzen',
