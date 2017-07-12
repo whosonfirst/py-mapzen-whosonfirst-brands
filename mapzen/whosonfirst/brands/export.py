@@ -3,6 +3,7 @@ import logging
 import json
 import mapzen.whosonfirst.brands.utils
 import atomicwrites
+import time
 
 class flatfile:
 
@@ -13,15 +14,19 @@ class flatfile:
 
         self.debug = kwargs.get('debug', False)
 
-    def export_feature(self, f, **kwagrs):
+    def export_brand(self, b, **kwargs):
 
-        return self.write_feature(self, f, **kwargs)
+        return self.write_brand(b, **kwargs)
     
-    def write_feature(self, f, **kwargs):
+    def write_brand(self, b, **kwargs):
 
-        indent = kwargs.get('indent', None)
+        now = int(time.time())
 
-        path = self.feature_path(f, **kwargs)
+        b["wof:lastmodified"] = now
+        
+        indent = kwargs.get('indent', 2)
+
+        path = self.brand_path(b, **kwargs)
         root = os.path.dirname(path)
 
         if not os.path.exists(root):
@@ -29,23 +34,29 @@ class flatfile:
 
         logging.info("writing %s" % (path))
 
+        fh = open(path, "w")
+        json.dump(b, fh, indent=indent)
+        fh.close()
+
+        """
         try:
 
             with atomicwrites.atomic_write(path, overwrite=True) as fh:
-                json.dump(f, fh, indent=indent)
+                json.dump(b, fh, indent=indent)
 
         except Exception, e:
             logging.error("failed to write %s, because %s" % (path, e))
             return None
-
+        """
+        
         return path
 
-    def feature_path(self, f, **kwargs):
+    def brand_path(self, b, **kwargs):
+        
+        brand_id = b.get("wof:brand_id", None)
 
-        wofid = f.get('wof:brand_id', None)
-
-        if wofid == None:
+        if brand_id == None:
             raise Exception, "Missing WOF brand ID"
 
-        abspath = mapzen.whosonfirst.brands.utils.id2abspath(wofid, **kwargs)
+        abspath = mapzen.whosonfirst.brands.utils.id2abspath(self.root, brand_id, **kwargs)
         return abspath
