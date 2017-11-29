@@ -1,0 +1,3 @@
+import spec	# as in: utils/mk-spec.py > mapzen/whosonfirst/brands/spec.py
+
+# PLEASE FINISH WRITING ME...
