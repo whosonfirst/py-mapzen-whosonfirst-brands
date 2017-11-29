@@ -61,6 +61,13 @@ def _callback_wrapper(args):
         logging.error("Failed to process feature because %s" % e)
         raise Exception, e
     
+def load(root, brand_id):
+
+    path = id2abspath(root, brand_id)
+
+    fh = open(path, "r")
+    return json.load(fh)
+
 def crawl(source, **kwargs):
 
     validate = kwargs.get('validate', False)
